@@ -64,27 +64,26 @@ public class MainActivity extends FlutterActivity {
     public void configureFlutterEngine(@NonNull FlutterEngine flutterEngine) {
         new MethodChannel(flutterEngine.getDartExecutor(), WRITE_CHANNEL).setMethodCallHandler(
         new MethodCallHandler() {
+            //Início da Execução
             @Override
             public void onMethodCall(MethodCall call, Result result) {
                 if (call.method.equals("writeTag")) {
-                    // tag = (byte[]) call.arguments;     
-                    String tagString = (String) call.arguments;     
-                    // String completeTag = CRC16(tagString);
-                    tag = hexString2Bytes(tagString);         //Recebe tag do flutter (em bytes ja)   
+                    String tagString = (String) call.arguments;     //Recebe tag do flutter
+                    tag = hexString2Bytes(tagString);               //Converte para bytes   
                     Log.d(TAG, tag.toString());
                     
-                    //tag = new byte[] {0x53, 0x57, 0x00, 0x05, (byte) 0xFF, 0x24, 0x02, 0x00, 0x2C};
-                    handler=new Handler();
+                    handler=new Handler();      //Cria o runnable
                     runnable=new Runnable(){
                         @Override
                         public void run() {
-                            assignEndpoint();   //Cria o runnable
+                            assignEndpoint();   
                             handler.postDelayed(this, 50);
                         }
                     };
             
-                    String writeResult = writeTag();    //Chama essa função
+                    //String writeResult = writeTag();    //Chama função que escreve na tag
 
+                
                     if (writeResult != "") {
                         result.success(writeResult);
                     } else {
@@ -138,14 +137,12 @@ public class MainActivity extends FlutterActivity {
     private String stringResult = "";
     private String writeTag() {
         
+        //Abre o dispositivo e executa o runnable
         myUsbManager = (UsbManager) getSystemService(Context.USB_SERVICE);
         enumerateDevice();
         
         if(openDevice()){   //Abre o dispositivo
             handler.postDelayed(runnable, 50);  //Executa o assign endpoint
-            //assignEndpoint();
-            // if (writeResult==tag.length) return "Tag written successfully " + stringResult;
-            // else return "Something went wrong";
             return "Result of bulk " + writeResult + " " +stringResult; 
         }
         return "Could not open device";        
@@ -191,21 +188,21 @@ public class MainActivity extends FlutterActivity {
         // if(iRet == 0) mShow.setText("No Reader");
     }
 
+    
     public void assignEndpoint() {
+        myDeviceConnection.claimInterface(intf, true);
+        
+
         if (myInterface.getEndpoint(1) != null) {
-            // stringResult += "Endpoint 1 encontrado ";
             epOut = myInterface.getEndpoint(1);
         }
         
         if (myInterface.getEndpoint(0) != null) {
-            // stringResult += "Endpoint 0 encontrado ";
             epIn = myInterface.getEndpoint(0);
         }
         
-        stringResult+=("\nInterface name: " + myInterface.getName());
-        stringResult+=("\nInterface Subclass: " + myInterface.getInterfaceSubclass());
-        stringResult+=("\nInterface Count: " + myUsbDevice.getInterfaceCount());
 
+        //Código para impressão de interfaces e endpoints
         // UsbInterface tempInterface = null;
         // UsbEndpoint endpointIN = null;
         // UsbEndpoint endpointOUT = null;
@@ -229,36 +226,15 @@ public class MainActivity extends FlutterActivity {
 
         // }
         
-        
-
-        //byte[] changeMode = new byte[] {(byte)0xFF, (byte)0x02, (byte)0x00};
-        // int re = myDeviceConnection.bulkTransfer(epOut, changeMode, changeMode.length, 10);
-    
-        
-        int re2 = myDeviceConnection.bulkTransfer(epOut, tag, tag.length, 200);
-        // int re2 = myDeviceConnection.controlTransfer (UsbConstants.USB_DIR_OUT, 
-        //         1, 1, 0, tag, tag.length, 50);
+                
+        //int re2 = myDeviceConnection.bulkTransfer(epOut, tag, tag.length, 200);
+         int re2 = myDeviceConnection.controlTransfer (UsbConstants.USB_DIR_OUT, 
+                 1, 1, 0, tag, tag.length, 50);
         
         stringResult += bytesToHexString(tag);        
-        byte[] tag = new byte[] {0x53, 0x57, 0x00, 0x05, (byte) 0xFF, 0x24, 0x02, 0x00, 0x2C};
-        
-        // re2 = myDeviceConnection.bulkTransfer(epOut, tag, tag.length, 200);
-        // stringResult += bytesToHexString(tag);
         
         writeResult = re2;
            
-        // if(reByte[0] != 0) {
-        //     //Log.i("reByte", re2 + "\n" + bytesToHexString(reByte));
-        //     String str1 = "",str2 = "";
-        //     int bPackLength = 0;
-        //     bPackLength = (int)reByte[16] - 3;
-        //     for (int i = 0; i < bPackLength; i++) {
-        //         str1 = String.format("%02X", reByte[19 + i]);
-        //         str2 = str2 + str1;
-        //     }
-            
-        // }
-        // return "Could not assign endpoint";
     }
 
 
