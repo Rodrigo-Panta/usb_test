@@ -227,9 +227,9 @@ public class MainActivity extends FlutterActivity {
         // }
         
                 
-        //int re2 = myDeviceConnection.bulkTransfer(epOut, tag, tag.length, 200);
-         int re2 = myDeviceConnection.controlTransfer (UsbConstants.USB_DIR_OUT, 
-                 1, 1, 0, tag, tag.length, 50);
+        int re2 = myDeviceConnection.bulkTransfer(epOut, tag, tag.length, 200);
+        //  int re2 = myDeviceConnection.controlTransfer (UsbConstants.USB_DIR_OUT, 
+        //          1, 1, 0, tag, tag.length, 50);
         
         stringResult += bytesToHexString(tag);        
         
