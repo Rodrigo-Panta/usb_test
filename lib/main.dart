@@ -52,14 +52,6 @@ class _PlatformChannelState extends State<PlatformChannel> {
     // ]));
 
     String tag = '53570016FF030102060000000000112233776665558899AABBD3';
-    // String tag = '53570015FF21D355000000001001003199000000010100001C';
-    // String tag = '53570005FF2402002C';
-    // String tag = '53570005FF2402002C';
-    // String tag = '53570005FF2402002C0200';
-    // String tag =
-    // "53570085FF21E05500000000110100319900000001000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000009F";
-    // String tag = '53570014FF04060000000000112233445522228899AABBD7';
-    // String tag = '53570016FF00000000EE000000000000000000001006';
     String escrita;
     print(tag.length);
     try {
@@ -76,10 +68,18 @@ class _PlatformChannelState extends State<PlatformChannel> {
   Future<void> _scanBarcode() async {
     // _barcode = await FlutterBarcodeScanner.scanBarcode(
     //     '#004297', "Cancel", true, ScanMode.BARCODE);
-    final String? result = await readMethodChannel.invokeMethod('readCode');
+    String? result = await readMethodChannel.invokeMethod('readCode');
+
+    if (result == null) {
+      setState(() => _barcode = "Não foi possível ler o código");
+    }
+
+    BigInt.parse(result!);
     setState(() {
       _barcode = result;
     });
+
+    result = '';
   }
 
   @override

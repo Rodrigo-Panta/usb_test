@@ -81,10 +81,10 @@ public class MainActivity extends FlutterActivity {
                         }
                     };
             
-                    //String writeResult = writeTag();    //Chama função que escreve na tag
+                    String writeResult = writeTag();    //Chama função que escreve na tag
 
                 
-                    if (writeResult != "") {
+                    if (!writeResult.equals("")) {
                         result.success(writeResult);
                     } else {
                     result.error("UNAVAILABLE", "Couldn't write tag.", null);
@@ -108,7 +108,7 @@ public class MainActivity extends FlutterActivity {
                             intentIntegrator.initiateScan();
 
                     
-                    if (readResult != "") {
+                    if (!readResult.equals("")) {
                     result.success(readResult);
                     } else {
                     result.error("UNAVAILABLE", "Couldn't read Barcode.", null);
@@ -129,7 +129,8 @@ public class MainActivity extends FlutterActivity {
             requestCode, resultCode, data
         );
         if(intentResult.getContents() != null) {
-            readResult = intentResult.getContents();
+            byte[] byteResult = intentResult.getRawBytes();
+            readResult = bytesToHexString(byteResult);
         }
     }
 
@@ -190,7 +191,6 @@ public class MainActivity extends FlutterActivity {
 
     
     public void assignEndpoint() {
-        myDeviceConnection.claimInterface(intf, true);
         
 
         if (myInterface.getEndpoint(1) != null) {
